@@ -1,0 +1,10 @@
+services:
+  python:
+    build: ./
+    container_name: fp-python
+    volumes:
+      - type: bind
+        source: ./parser
+        target: /var/www/parser
+    tty: true
+
