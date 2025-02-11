@@ -19,6 +19,24 @@ def get_first_timestamp(path: str) -> str:
 
     return f'{date[0]}T00:00:00Z'
 
+
+def need_complement(last_timestamp: str, current_timestamp: str) -> bool:
+    """ 前の行の時刻と現在行の時刻を比較し、補完が必要か判定する。
+    前の行の時刻と現在行の時刻の差が1分より大きい場合、補完が必要と判定する。
+
+    Args:
+        last_timestamp (str): 前の行の時刻
+        current_timestamp (str): 現在行の時刻
+
+    Returns:
+        bool: (True: 補完が必要, False: 補完が不要)
+    """
+    last = datetime.datetime.strptime(current_timestamp, '%Y-%m-%dT%H:%M:%SZ')
+    current = datetime.datetime.strptime(last_timestamp, '%Y-%m-%dT%H:%M:%SZ')
+
+    return last - current > datetime.timedelta(minutes=1)
+
+
 def main():
     INPUT_FILE = './fitbit_files/steps/steps_2025-02-01.csv'
     
@@ -40,7 +58,7 @@ def main():
             print(row)
 
             # 補完対象判定
-            if datetime.datetime.strptime(row[0], '%Y-%m-%dT%H:%M:%SZ') - datetime.datetime.strptime(last_timestamp, '%Y-%m-%dT%H:%M:%SZ') > datetime.timedelta(minutes=1):
+            if need_complement(last_timestamp, row[0]):
                 print('補完対象')
                 print(row[0])
                 print(last_timestamp)
