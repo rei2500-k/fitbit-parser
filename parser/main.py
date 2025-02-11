@@ -37,6 +37,21 @@ def need_complement(last_timestamp: str, current_timestamp: str) -> bool:
     return last - current > datetime.timedelta(minutes=1)
 
 
+def next_timestamp(timestamp: str) -> str:
+    """ 補完用の時刻を生成する。
+
+    Args:
+        timestamp (str): 前の行の時刻
+
+    Returns:
+        str: 補完用の時刻
+    """
+    d_timestamp = datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
+    next_time = d_timestamp + datetime.timedelta(minutes=1)
+
+    return next_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
 def main():
     INPUT_FILE = './fitbit_files/steps/steps_2025-02-01.csv'
     
@@ -58,11 +73,15 @@ def main():
             print(row)
 
             # 補完対象判定
-            if need_complement(last_timestamp, row[0]):
+            while need_complement(last_timestamp, row[0]):
                 print('補完対象')
-                print(row[0])
-                print(last_timestamp)
+                
+                next_time = next_timestamp(last_timestamp)
                 # 補完処理
+                complement_row = [next_time, 0]
+                print(complement_row)
+
+                last_timestamp = next_time
 
             last_timestamp = row[0]
             break
